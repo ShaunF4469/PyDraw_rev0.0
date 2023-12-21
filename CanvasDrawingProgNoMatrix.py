@@ -48,6 +48,7 @@ PlusPos = [(margin * 2) + 52, (margin + height) * 8 + 92,
 # --- Screen-clearing code goes here
 CANVAS = [[BLACK]*8 for _ in range(8)]
     
+# --- Palette initialization and setting
 palette_data = [[BLACK]*8 for _ in range(2)]
 PALETTE = [[BLACK]*8 for _ in range(2)]
 PALETTE [0][0] = BLACK
@@ -108,6 +109,8 @@ while not done:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # User clicks the mouse. Get the position
             pos = pygame.mouse.get_pos()
+
+            # --- Canvas Updates
             if pos[0] < CanvasPos[0] and pos[1] < CanvasPos[1]:
                 # Change the x/y screen coordinates to grid coordinates
                 column = pos[0] // (width + margin)
@@ -121,12 +124,16 @@ while not done:
                 # Set paintbrush color from palette
                 PaintBrush = PALETTE[column][row]
                 print("Click ", pos, "Pal. coordinates: ", row, column, PalettePos)
+
+            # --- Reset clicked?
             elif pos[0] > ResetPos[0] and\
             pos[0] < ResetPos[2] and\
             pos[1] > ResetPos[1] and\
             pos[1] < ResetPos[3]:
                 CANVAS = [[BLACK]*8 for _ in range(8)]
                 print("Click ", pos, "Grid coordinates: ", row, column, CanvasPos)
+
+            # --- Brightness modified?
             elif pos[0] > MinusPos[0] and\
             pos[0] < MinusPos[2] and\
             pos[1] > MinusPos[1] and\
@@ -160,7 +167,8 @@ while not done:
                                 [(margin + width) * column + margin,
                                 (margin + height) * row + margin,
                                 width,
-                                height])           
+                                height])    
+            
     # --- Draw palette for color choices ---
     file = open('palette.csv' , 'w', newline = '')
     for row in range(8):
