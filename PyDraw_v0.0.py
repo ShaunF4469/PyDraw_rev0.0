@@ -31,10 +31,10 @@ width = 45
 height = 45
 
 # --- Set Margin between cells
-margin = 10
+margin = 3
 
 # --- Variable used to hold brightness level
-BrightLevel = 3
+BrightLevel = 0
 
 # --- Screen Zone constraints
 CanvasPos = ((margin + width) * 8, (margin + height) * 8)
