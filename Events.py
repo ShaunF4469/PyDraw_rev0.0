@@ -10,12 +10,12 @@ pygame.init()
 #---Function definitions:---
 def etype():
         etype = 0
-        for event in pygame.event.get():  # User did something
-            if event.type == pygame.QUIT:  # If user clicked close
-                etype = 99  # Flag that we are done so we exit this loop
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                etype = 1
-        clock.tick(60)
+        pygame.event.poll()  # User did something
+        if pygame.QUIT:  # If user clicked close
+            etype = 99  # Flag that we are done so we exit this loop
+        elif pygame.MOUSEBUTTONDOWN:
+            etype = 1
+        #clock.tick(60)
         return etype
 
 def uiEvents():
