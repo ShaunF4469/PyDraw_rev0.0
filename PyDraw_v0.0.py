@@ -36,6 +36,7 @@ class button:
         pygame.draw.rect(self.screen, (0, 0, 0), [bx, by, bw, bh])
         # --- Draw button face
         pygame.draw.rect(self.screen, self.color, [x, y, w, h])
+        # --- Draw nameplate on button
         self.screen.blit(textbox,(wcen, hcen))
         
  
