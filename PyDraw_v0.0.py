@@ -207,10 +207,7 @@ while not done:
         write = csv.writer(file)
         write.writerows(palette_data)
     file.close()
-    # --- Draw paint brush display
-    pygame.draw.rect(screen, BLACK, [479 + margin, 479, 102, 102])
-    pygame.draw.rect(screen, PaintBrush, [480 + margin, 480, 100, 100])
-
+    
     # --- Draw a Reset button and RGB Values
     R,G,B = PaintBrush
     RedSurface = myfont.render('Red = ' + str(R), False, (0, 0, 0), (255, 255, 255))
@@ -241,6 +238,10 @@ while not done:
     pygame.draw.rect(screen, WHITE, [(margin * 2) + 52, (margin + height) * 8 + 92, 26, 26])
     screen.blit(PlusSur,((margin * 2) + 57, (margin + height) * 8 + 88))
     
+# --- Draw paint brush display
+    pygame.draw.rect(screen, BLACK, [479 + margin, 479, 102, 102])
+    pygame.draw.rect(screen, PaintBrush, [480 + margin, 480, 100, 100])
+
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
  
