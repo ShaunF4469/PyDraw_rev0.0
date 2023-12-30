@@ -37,9 +37,9 @@ margin = 3
 BrightLevel = 0
 
 # --- Screen Zone constraints
-CanvasPos = ((margin + width) * 8, (margin + height) * 8)
-PalettePos = (600 - ((margin + width) * 2), (margin + height) * 8)
-ResetPos = (349, 539, 349 + 85, 539 + 34)
+CanvasPos = [(margin + width) * 8, (margin + height) * 8]
+PalettePos = [600 - ((margin + width) * 2), (margin + height) * 8]
+ResetPos = [349, 539, 349 + 85, 539 + 34]
 MinusPos = [(margin * 2) + 2, (margin + height) * 8 + 92,
             ((margin * 2) + 2) + 26, ((margin + height) * 8 + 92) + 26]
 PlusPos = [(margin * 2) + 52, (margin + height) * 8 + 92,
@@ -126,21 +126,30 @@ while not done:
                     rclick = False
             
             pos = pygame.mouse.get_pos()
+            x = pos[0]
+            y = pos[1]
+            cx = CanvasPos[0]
+            cy = CanvasPos[1]
+            px = PalettePos[0]
+            py = PalettePos[1]
+            p_off = size[0] - ((width + margin) * 2)
 
             # --- Canvas Updates
-            if (lclick and pos[0] < CanvasPos[0] and pos[1] < CanvasPos[1]):
+            if (lclick and x < cx and y < cy):
                 # Change the x/y screen coordinates to grid coordinates
-                column = pos[0] // (width + margin)
-                row = pos[1] // (height + margin)
+                col = x // (width + margin)
+                row = y // (height + margin)
                 # Set that location to one
-                CANVAS[column][row] = PaintBrush
-                print("Click ", pos, "Grid coordinates: ", row, column, CanvasPos)
-            elif (lclick and pos[0] > PalettePos[0] and pos [1] < PalettePos[1]):
-                column = (pos[0] - 490) // (width + margin)
-                row = pos[1] // (height + margin)
+                CANVAS[col][row] = PaintBrush
+                print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
+            
+            # --- Selected new color
+            elif (lclick and x > px and y < py):
+                col = (x - p_off) // (width + margin)
+                row = y // (height + margin)
                 # Set paintbrush color from palette
-                PaintBrush = PALETTE[column][row]
-                print("Click ", pos, "Pal. coordinates: ", row, column, PalettePos)
+                PaintBrush = PALETTE[col][row]
+                print("Click ", pos, "Pal. coordinates: ", row, col, PalettePos)
 
             # --- Reset clicked?
             elif (lclick and pos[0] > ResetPos[0] and\
@@ -148,7 +157,7 @@ while not done:
             pos[1] > ResetPos[1] and\
             pos[1] < ResetPos[3]):
                 CANVAS = [[BLACK]*8 for _ in range(8)]
-                print("Click ", pos, "Grid coordinates: ", row, column, CanvasPos)
+                print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
 
             # --- Brightness modified?
             elif (lclick and pos[0] > MinusPos[0] and\
@@ -164,7 +173,7 @@ while not done:
             pos[1] < PlusPos[3] and\
             BrightLevel < 10):
                 BrightLevel = BrightLevel + 1
-                print("Click ", pos, "Grid coordinates: ", row, column, CanvasPos)
+                print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
             else:
                 
                 # Set the screen background
@@ -172,16 +181,16 @@ while not done:
         
     # --- Draw Canvas ---
     for row in range(8):
-        for column in range(8):
+        for col in range(8):
             pygame.draw.rect(screen,
                                 BLACK,
-                                [(margin + width) * column + (margin - 1),
+                                [(margin + width) * col + (margin - 1),
                                 (margin + height) * row + (margin - 1),
                                 width + 2,
                                 height + 2])
             pygame.draw.rect(screen,
-                                CANVAS [column][row],
-                                [(margin + width) * column + margin,
+                                CANVAS [col][row],
+                                [(margin + width) * col + margin,
                                 (margin + height) * row + margin,
                                 width,
                                 height])    
@@ -189,20 +198,20 @@ while not done:
     # --- Draw palette for color choices ---
     file = open('palette.csv' , 'w', newline = '')
     for row in range(8):
-        for column in range(2):
+        for col in range(2):
             pygame.draw.rect(screen,
                                 BLACK,
-                                [(margin + width) * column + (margin - 1) + 480,
+                                [(margin + width) * col + (margin - 1) + (p_off - margin),
                                 (margin + height) * row + (margin - 1),
                                 width + 2,
                                 height + 2])
             pygame.draw.rect(screen,
-                                PALETTE [column][row],
-                                [(margin + width) * column + margin + 480,
+                                PALETTE [col][row],
+                                [(margin + width) * col + margin + (p_off - margin),
                                 (margin + height) * row + margin,
                                 width,
                                 height])
-            palette_data [column][row] = PALETTE [column][row]
+            palette_data [col][row] = PALETTE [col][row]
     with file:
         write = csv.writer(file)
         write.writerows(palette_data)
@@ -225,18 +234,18 @@ while not done:
     # --- Draw Brightness controls
     pygame.draw.rect(screen, BLACK, [margin - 1, (margin + height) * 8 + 30, 100, 100])
     pygame.draw.rect(screen, WHITE, [margin, (margin + height) * 8 + 31, 98, 98])
-    screen.blit(BrightnessSur,((margin * 2) - 5, (margin + height) * 8 + 35))
+    screen.blit(BrightnessSur,((margin * 2) + 3, (margin + height) * 8 + 35))
     
     BrightLevelSur = myfont.render(str(BrightLevel), False, (0, 0, 0))
-    screen.blit(BrightLevelSur,((margin * 2) + 30, (margin + height) * 8 + 60))
+    screen.blit(BrightLevelSur,((margin * 2) + 30 + 5, (margin + height) * 8 + 60))
     
-    pygame.draw.rect(screen, BLACK, [margin * 2, (margin + height) * 8 + 90, 30, 30])
-    pygame.draw.rect(screen, WHITE, [(margin * 2) + 2, (margin + height) * 8 + 92, 26, 26])
-    screen.blit(MinusSur,((margin * 2) + 10, (margin + height) * 8 + 90))
+    pygame.draw.rect(screen, BLACK, [margin * 2 + 5, (margin + height) * 8 + 90, 30, 30])
+    pygame.draw.rect(screen, WHITE, [(margin * 2) + 2 + 5, (margin + height) * 8 + 92, 26, 26])
+    screen.blit(MinusSur,((margin * 2) + 15, (margin + height) * 8 + 90))
 
-    pygame.draw.rect(screen, BLACK, [(margin * 2) + 50, (margin + height) * 8 + 90, 30, 30])
-    pygame.draw.rect(screen, WHITE, [(margin * 2) + 52, (margin + height) * 8 + 92, 26, 26])
-    screen.blit(PlusSur,((margin * 2) + 57, (margin + height) * 8 + 88))
+    pygame.draw.rect(screen, BLACK, [(margin * 2) + 50 + 5, (margin + height) * 8 + 90, 30, 30])
+    pygame.draw.rect(screen, WHITE, [(margin * 2) + 52 + 5, (margin + height) * 8 + 92, 26, 26])
+    screen.blit(PlusSur,((margin * 2) + 57 + 5, (margin + height) * 8 + 88))
     
 # --- Draw paint brush display
     pygame.draw.rect(screen, BLACK, [479 + margin, 479, 102, 102])
