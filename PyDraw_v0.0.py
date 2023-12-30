@@ -99,26 +99,43 @@ clock = pygame.time.Clock()
 
 # --- Init screen
 screen.fill(WHITE)
- 
+ # --- Mouse state variables
+lclick = False
+mclick = False
+rclick = False
 
 # --- Program loop
 while not done:
-    for event in pygame.event.get():  # User did something
+    for event in pygame.event.get():  #User does something
         if event.type == pygame.QUIT:  # If user clicked close
             done = True  # Flag that we are done so we exit this loop
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            # User clicks the mouse. Get the position
+        else: #If user did not quit....
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    lclick = True
+                if event.button == 2:
+                    mclick = True
+                if event.button == 3:
+                    rclick = True
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    lclick = False
+                if event.button == 2:
+                    mclick = False
+                if event.button == 3:
+                    rclick = False
+            
             pos = pygame.mouse.get_pos()
 
             # --- Canvas Updates
-            if pos[0] < CanvasPos[0] and pos[1] < CanvasPos[1]:
+            if (lclick and pos[0] < CanvasPos[0] and pos[1] < CanvasPos[1]):
                 # Change the x/y screen coordinates to grid coordinates
                 column = pos[0] // (width + margin)
                 row = pos[1] // (height + margin)
                 # Set that location to one
                 CANVAS[column][row] = PaintBrush
                 print("Click ", pos, "Grid coordinates: ", row, column, CanvasPos)
-            elif pos[0] > PalettePos[0] and pos [1] < PalettePos[1]:
+            elif (lclick and pos[0] > PalettePos[0] and pos [1] < PalettePos[1]):
                 column = (pos[0] - 490) // (width + margin)
                 row = pos[1] // (height + margin)
                 # Set paintbrush color from palette
@@ -126,34 +143,32 @@ while not done:
                 print("Click ", pos, "Pal. coordinates: ", row, column, PalettePos)
 
             # --- Reset clicked?
-            elif pos[0] > ResetPos[0] and\
+            elif (lclick and pos[0] > ResetPos[0] and\
             pos[0] < ResetPos[2] and\
             pos[1] > ResetPos[1] and\
-            pos[1] < ResetPos[3]:
+            pos[1] < ResetPos[3]):
                 CANVAS = [[BLACK]*8 for _ in range(8)]
                 print("Click ", pos, "Grid coordinates: ", row, column, CanvasPos)
 
             # --- Brightness modified?
-            elif pos[0] > MinusPos[0] and\
+            elif (lclick and pos[0] > MinusPos[0] and\
             pos[0] < MinusPos[2] and\
             pos[1] > MinusPos[1] and\
             pos[1] < MinusPos[3] and\
-            BrightLevel > 0:
+            BrightLevel > 0):
                 BrightLevel = BrightLevel - 1
                 print("Click ", pos, MinusPos)
-            elif pos[0] > PlusPos[0] and\
+            elif (lclick and pos[0] > PlusPos[0] and\
             pos[0] < PlusPos[2] and\
             pos[1] > PlusPos[1] and\
             pos[1] < PlusPos[3] and\
-            BrightLevel < 10:
+            BrightLevel < 10):
                 BrightLevel = BrightLevel + 1
                 print("Click ", pos, "Grid coordinates: ", row, column, CanvasPos)
             else:
                 
                 # Set the screen background
                 screen.fill(WHITE)
-        elif event.type == pygame.MOUSEMOTION:
-            pass
         
     # --- Draw Canvas ---
     for row in range(8):
