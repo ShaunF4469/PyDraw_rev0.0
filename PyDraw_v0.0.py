@@ -9,7 +9,7 @@ import csv
 #dots = dotstar.DotStar(board.SCK, board.MOSI, 64, brightness=0.50)
 
 class button:
-    def __init__(self, nameplate, loc, size, color, border, screen, lfont, fsize):
+    def __init__(self, nameplate, loc, size, color, border, screen, lfont, fsize=25):
         self.nameplate = nameplate
         self.loc = loc
         self.size = size
@@ -31,15 +31,14 @@ class button:
         wcen = bx - ((bw - (len(self.nameplate) * (self.fsize / 0.75))) / 2)
         hcen = by + ((bh - (self.fsize / 0.75)) / 2)
 
-        textbox = self.lfont.render(self.nameplate, False, (0, 0, 0))
+        textbox = self.lfont.render(self.nameplate, True, (0, 0, 0))
         # --- Draw border
         pygame.draw.rect(self.screen, (0, 0, 0), [bx, by, bw, bh])
         # --- Draw button face
         pygame.draw.rect(self.screen, self.color, [x, y, w, h])
         # --- Draw nameplate on button
         self.screen.blit(textbox,(wcen, hcen))
-        
- 
+
 # --- Define initial colors
 BLACK = (0, 0, 0)
 SILVER = (192, 192, 192)
@@ -114,13 +113,13 @@ pygame.init()
 size = (600, 600)
 screen = pygame.display.set_mode(size)
 
-ResetSurface = myfont.render('Reset', False, (255, 255, 255), (255, 165, 0))
-RedSurface = myfont.render('Red = ', False, (0, 0, 0))
-BlueSurface = myfont.render('Blue = ', False, (0, 0, 0))
-GreenSurface = myfont.render('Green = ', False, (0, 0, 0))
+ResetSurface = myfont.render('Reset', True, (255, 255, 255), (255, 165, 0))
+RedSurface = myfont.render('Red = ', True, (0, 0, 0))
+BlueSurface = myfont.render('Blue = ', True, (0, 0, 0))
+GreenSurface = myfont.render('Green = ', True, (0, 0, 0))
 PlusSur = myfont.render('+', False, (0, 0, 0))
 MinusSur = myfont.render('-', False, (0, 0, 0))
-BrightnessSur = myfontSm.render('Brightness', False, (0, 0, 0))
+BrightnessSur = myfontSm.render('Brightness', True, (0, 0, 0))
 
  
 pygame.display.set_caption("Canvas")
@@ -253,9 +252,9 @@ while not done:
     
     # --- Draw a Reset button and RGB Values
     R,G,B = PaintBrush
-    RedSurface = myfont.render('Red = ' + str(R), False, (0, 0, 0), (255, 255, 255))
-    GreenSurface = myfont.render('Green = ' + str(G), False, (0, 0, 0), (255, 255, 255))
-    BlueSurface = myfont.render('Blue = ' + str(B), False, (0, 0, 0), (255, 255, 255))
+    RedSurface = myfont.render('Red = ' + str(R), True, (0, 0, 0), (255, 255, 255))
+    GreenSurface = myfont.render('Green = ' + str(G), True, (0, 0, 0), (255, 255, 255))
+    BlueSurface = myfont.render('Blue = ' + str(B), True, (0, 0, 0), (255, 255, 255))
     pygame.draw.rect(screen, WHITE, [149, ((height + margin) * 8) + 29,
                                         340, ((height + margin) * 8) + 160])
     screen.blit(RedSurface, (150, ((height + margin) * 8) + 30))
@@ -272,7 +271,7 @@ while not done:
     pygame.draw.rect(screen, WHITE, [margin, (margin + height) * 8 + 31, 98, 98])
     screen.blit(BrightnessSur,((margin * 2) + 3, (margin + height) * 8 + 35))
     
-    BrightLevelSur = myfont.render(str(BrightLevel), False, (0, 0, 0))
+    BrightLevelSur = myfont.render(str(BrightLevel), True, (0, 0, 0))
     screen.blit(BrightLevelSur,((margin * 2) + 30 + 5, (margin + height) * 8 + 60))
     
     pygame.draw.rect(screen, BLACK, [margin * 2 + 5, (margin + height) * 8 + 90, 30, 30])
@@ -282,11 +281,11 @@ while not done:
     pygame.draw.rect(screen, BLACK, [(margin * 2) + 50 + 5, (margin + height) * 8 + 90, 30, 30])
     pygame.draw.rect(screen, WHITE, [(margin * 2) + 52 + 5, (margin + height) * 8 + 92, 26, 26])
     screen.blit(PlusSur,((margin * 2) + 57 + 5, (margin + height) * 8 + 88))
-    
+
 # --- Draw paint brush display
     pygame.draw.rect(screen, BLACK, [479 + margin, 479, 102, 102])
     pygame.draw.rect(screen, PaintBrush, [480 + margin, 480, 100, 100])
-
+    
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
  
