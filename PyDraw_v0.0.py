@@ -152,7 +152,9 @@ while not done:
                 
                 # Set the screen background
                 screen.fill(WHITE)
-    
+        elif event.type == pygame.MOUSEMOTION:
+            pass
+        
     # --- Draw Canvas ---
     for row in range(8):
         for column in range(8):
