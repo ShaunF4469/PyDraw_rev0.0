@@ -7,6 +7,37 @@ import csv
 
 # --- Set matrix variable
 #dots = dotstar.DotStar(board.SCK, board.MOSI, 64, brightness=0.50)
+
+class button:
+    def __init__(self, nameplate, loc, size, color, border, screen, lfont, fsize):
+        self.nameplate = nameplate
+        self.loc = loc
+        self.size = size
+        self.color = color
+        self.border = border
+        self.screen = screen
+        self.lfont = lfont
+        self.fsize = fsize
+
+    def draw(self):
+        bx = self.loc[0]
+        by = self.loc[1]
+        x = bx + self.border
+        y = by + self.border
+        bw = self.size[0]
+        bh = self.size[1]
+        w = bw - (self.border * 2)
+        h = bh - (self.border * 2)
+        wcen = bx - ((bw - (len(self.nameplate) * (self.fsize / 0.75))) / 2)
+        hcen = by + ((bh - (self.fsize / 0.75)) / 2)
+
+        textbox = self.lfont.render(self.nameplate, False, (0, 0, 0))
+        # --- Draw border
+        pygame.draw.rect(self.screen, (0, 0, 0), [bx, by, bw, bh])
+        # --- Draw button face
+        pygame.draw.rect(self.screen, self.color, [x, y, w, h])
+        self.screen.blit(textbox,(wcen, hcen))
+        
  
 # --- Define initial colors
 BLACK = (0, 0, 0)
@@ -71,8 +102,10 @@ PALETTE [1][7] = CYAN
 PaintBrush = BLUE
     
 pygame.font.init()
-myfont = pygame.font.SysFont('Times New Roman MS', 45)
-myfontSm = pygame.font.SysFont('Times New Roman MS', 25)
+lrgFontSize = 45
+smFontSize = 25
+myfont = pygame.font.SysFont('Times New Roman MS', lrgFontSize)
+myfontSm = pygame.font.SysFont('Times New Roman MS', smFontSize)
 
 pygame.init()
  
@@ -228,8 +261,10 @@ while not done:
     screen.blit(GreenSurface, (150, ((height + margin) * 8) + 70))
     screen.blit(BlueSurface, (150, ((height + margin) * 8) + 110))
 
-    pygame.draw.rect(screen, BLACK, [349, 539, 85, 33])
-    screen.blit(ResetSurface,(350, 540))
+    butReset = button('Reset',[349, 539], [85, 33], ORANGE, 1, screen, myfontSm, smFontSize)
+    butReset.draw()
+    #pygame.draw.rect(screen, BLACK, [349, 539, 85, 33])
+    #screen.blit(ResetSurface,(350, 540))
 
     # --- Draw Brightness controls
     pygame.draw.rect(screen, BLACK, [margin - 1, (margin + height) * 8 + 30, 100, 100])
