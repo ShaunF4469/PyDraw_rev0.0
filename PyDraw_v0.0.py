@@ -28,8 +28,9 @@ class button:
         bh = self.size[1]
         w = bw - (self.border * 2)
         h = bh - (self.border * 2)
-        wcen = bx - ((bw - (len(self.nameplate) * (self.fsize / 0.75))) / 2)
-        hcen = by + ((bh - (self.fsize / 0.75)) / 2)
+        tsize = self.lfont.size(self.nameplate)
+        wcen = bx + ((bw - tsize[0]) / 2)
+        hcen = by + ((bh - tsize[1]) / 2)
 
         textbox = self.lfont.render(self.nameplate, True, (0, 0, 0))
         # --- Draw border
@@ -38,7 +39,7 @@ class button:
         pygame.draw.rect(self.screen, self.color, [x, y, w, h])
         # --- Draw nameplate on button
         self.screen.blit(textbox,(wcen, hcen))
-
+        
 # --- Define initial colors
 BLACK = (0, 0, 0)
 SILVER = (192, 192, 192)
