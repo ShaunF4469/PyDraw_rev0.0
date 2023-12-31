@@ -9,7 +9,7 @@ import csv
 #dots = dotstar.DotStar(board.SCK, board.MOSI, 64, brightness=0.50)
 
 class button:
-    def __init__(self, nameplate, loc, size, color, border, screen, lfont, fsize=25):
+    def __init__(self, nameplate, loc, size, color, border, screen, lfont, fsize=25, cen=True):
         self.nameplate = nameplate
         self.loc = loc
         self.size = size
@@ -18,6 +18,7 @@ class button:
         self.screen = screen
         self.lfont = lfont
         self.fsize = fsize
+        self.cen = cen
 
     def draw(self):
         bx = self.loc[0]
@@ -30,7 +31,10 @@ class button:
         h = bh - (self.border * 2)
         tsize = self.lfont.size(self.nameplate)
         wcen = bx + ((bw - tsize[0]) / 2)
-        hcen = by + ((bh - tsize[1]) / 2)
+        if self.cen:
+            hcen = by + ((bh - tsize[1]) / 2)
+        else:
+            hcen = by + 5
 
         textbox = self.lfont.render(self.nameplate, True, (0, 0, 0))
         # --- Draw border
@@ -114,13 +118,9 @@ pygame.init()
 size = (600, 600)
 screen = pygame.display.set_mode(size)
 
-ResetSurface = myfont.render('Reset', True, (255, 255, 255), (255, 165, 0))
 RedSurface = myfont.render('Red = ', True, (0, 0, 0))
 BlueSurface = myfont.render('Blue = ', True, (0, 0, 0))
 GreenSurface = myfont.render('Green = ', True, (0, 0, 0))
-PlusSur = myfont.render('+', False, (0, 0, 0))
-MinusSur = myfont.render('-', False, (0, 0, 0))
-BrightnessSur = myfontSm.render('Brightness', True, (0, 0, 0))
 
  
 pygame.display.set_caption("Canvas")
@@ -135,6 +135,7 @@ clock = pygame.time.Clock()
 screen.fill(WHITE)
  # --- Mouse state variables
 lclick = False
+lclickedge = False
 mclick = False
 rclick = False
 
@@ -144,13 +145,21 @@ while not done:
         if event.type == pygame.QUIT:  # If user clicked close
             done = True  # Flag that we are done so we exit this loop
         else: #If user did not quit....
+            lclickedge = False
+            scrlup = False
+            scrldn = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     lclick = True
+                    lclickedge = True
                 if event.button == 2:
                     mclick = True
                 if event.button == 3:
                     rclick = True
+                if event.button == 4:
+                    scrlup = True    
+                if event.button == 5:
+                    scrldn = True
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     lclick = False
@@ -158,7 +167,7 @@ while not done:
                     mclick = False
                 if event.button == 3:
                     rclick = False
-            
+                            
             pos = pygame.mouse.get_pos()
             x = pos[0]
             y = pos[1]
@@ -178,7 +187,7 @@ while not done:
                 print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
             
             # --- Selected new color
-            elif (lclick and x > px and y < py):
+            elif (lclickedge and x > px and y < py):
                 col = (x - p_off) // (width + margin)
                 row = y // (height + margin)
                 # Set paintbrush color from palette
@@ -194,19 +203,19 @@ while not done:
                 print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
 
             # --- Brightness modified?
-            elif (lclick and pos[0] > MinusPos[0] and\
+            elif (lclickedge and pos[0] > MinusPos[0] and\
             pos[0] < MinusPos[2] and\
             pos[1] > MinusPos[1] and\
             pos[1] < MinusPos[3] and\
             BrightLevel > 0):
-                BrightLevel = BrightLevel - 1
+                BrightLevel -= 1
                 print("Click ", pos, MinusPos)
-            elif (lclick and pos[0] > PlusPos[0] and\
+            elif (lclickedge and pos[0] > PlusPos[0] and\
             pos[0] < PlusPos[2] and\
             pos[1] > PlusPos[1] and\
             pos[1] < PlusPos[3] and\
             BrightLevel < 10):
-                BrightLevel = BrightLevel + 1
+                BrightLevel += 1
                 print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
             else:
                 
@@ -251,7 +260,7 @@ while not done:
         write.writerows(palette_data)
     file.close()
     
-    # --- Draw a Reset button and RGB Values
+    # --- Draw RGB Values
     R,G,B = PaintBrush
     RedSurface = myfont.render('Red = ' + str(R), True, (0, 0, 0), (255, 255, 255))
     GreenSurface = myfont.render('Green = ' + str(G), True, (0, 0, 0), (255, 255, 255))
@@ -262,27 +271,26 @@ while not done:
     screen.blit(GreenSurface, (150, ((height + margin) * 8) + 70))
     screen.blit(BlueSurface, (150, ((height + margin) * 8) + 110))
 
-    butReset = button('Reset',[349, 539], [85, 33], ORANGE, 1, screen, myfontSm, smFontSize)
+    # --- Draw a Reset button
+    butReset = button('Reset',[349, 539], [85, 33], ORANGE, 1, screen, myfontSm)
     butReset.draw()
-    #pygame.draw.rect(screen, BLACK, [349, 539, 85, 33])
-    #screen.blit(ResetSurface,(350, 540))
-
-    # --- Draw Brightness controls
-    pygame.draw.rect(screen, BLACK, [margin - 1, (margin + height) * 8 + 30, 100, 100])
-    pygame.draw.rect(screen, WHITE, [margin, (margin + height) * 8 + 31, 98, 98])
-    screen.blit(BrightnessSur,((margin * 2) + 3, (margin + height) * 8 + 35))
     
+    # --- Draw Brightness controls
+    # -- Main panel (not a button, but it works!)
+    butBrightness = button('Brightness', [margin - 1, (margin + height) * 8 + 30], [100, 100], WHITE, 1, screen, myfontSm, smFontSize, False)
+    butBrightness.draw()
+        
+    # -- Brightness level display
     BrightLevelSur = myfont.render(str(BrightLevel), True, (0, 0, 0))
     screen.blit(BrightLevelSur,((margin * 2) + 30 + 5, (margin + height) * 8 + 60))
     
-    pygame.draw.rect(screen, BLACK, [margin * 2 + 5, (margin + height) * 8 + 90, 30, 30])
-    pygame.draw.rect(screen, WHITE, [(margin * 2) + 2 + 5, (margin + height) * 8 + 92, 26, 26])
-    screen.blit(MinusSur,((margin * 2) + 15, (margin + height) * 8 + 90))
+    # -- Minus and Plus keys
+    butMinus = button('-', [margin * 2 + 5, (margin + height) * 8 + 90], [30, 30], WHITE, 1, screen, myfontSm)
+    butMinus.draw()
 
-    pygame.draw.rect(screen, BLACK, [(margin * 2) + 50 + 5, (margin + height) * 8 + 90, 30, 30])
-    pygame.draw.rect(screen, WHITE, [(margin * 2) + 52 + 5, (margin + height) * 8 + 92, 26, 26])
-    screen.blit(PlusSur,((margin * 2) + 57 + 5, (margin + height) * 8 + 88))
-
+    butPlus = button('+', [(margin * 2) + 50 + 5, (margin + height) * 8 + 90], [30, 30], WHITE, 1, screen, myfontSm)
+    butPlus.draw()
+    
 # --- Draw paint brush display
     pygame.draw.rect(screen, BLACK, [479 + margin, 479, 102, 102])
     pygame.draw.rect(screen, PaintBrush, [480 + margin, 480, 100, 100])
