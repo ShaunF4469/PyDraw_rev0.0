@@ -63,8 +63,8 @@ TEAL = (0, 128, 128)
 CYAN = (0, 255, 255)
 
 # --- Set Width and Height of each grid location
-width = 45
-height = 45
+width = 52
+height = 52
 
 # --- Set Margin between cells
 margin = 3
@@ -118,6 +118,7 @@ pygame.init()
 size = (600, 600)
 screen = pygame.display.set_mode(size)
 
+BG = WHITE
 RedSurface = myfont.render('Red = ', True, (0, 0, 0))
 BlueSurface = myfont.render('Blue = ', True, (0, 0, 0))
 GreenSurface = myfont.render('Green = ', True, (0, 0, 0))
@@ -132,7 +133,7 @@ done = False
 clock = pygame.time.Clock()
 
 # --- Init screen
-screen.fill(WHITE)
+screen.fill(BG)
  # --- Mouse state variables
 lclick = False
 lclickedge = False
@@ -220,7 +221,7 @@ while not done:
             else:
                 
                 # Set the screen background
-                screen.fill(WHITE)
+                screen.fill(BG)
         
     # --- Draw Canvas ---
     for row in range(8):
@@ -277,7 +278,7 @@ while not done:
     
     # --- Draw Brightness controls
     # -- Main panel (not a button, but it works!)
-    butBrightness = button('Brightness', [margin - 1, (margin + height) * 8 + 30], [100, 100], WHITE, 1, screen, myfontSm, smFontSize, False)
+    butBrightness = button('Brightness', [margin - 1, (margin + height) * 8 + 30], [100, 100], BG, 1, screen, myfontSm, smFontSize, False)
     butBrightness.draw()
         
     # -- Brightness level display
@@ -285,10 +286,10 @@ while not done:
     screen.blit(BrightLevelSur,((margin * 2) + 30 + 5, (margin + height) * 8 + 60))
     
     # -- Minus and Plus keys
-    butMinus = button('-', [margin * 2 + 5, (margin + height) * 8 + 90], [30, 30], WHITE, 1, screen, myfontSm)
+    butMinus = button('-', [margin * 2 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfontSm)
     butMinus.draw()
 
-    butPlus = button('+', [(margin * 2) + 50 + 5, (margin + height) * 8 + 90], [30, 30], WHITE, 1, screen, myfontSm)
+    butPlus = button('+', [(margin * 2) + 50 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfontSm)
     butPlus.draw()
     
 # --- Draw paint brush display
