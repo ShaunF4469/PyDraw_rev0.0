@@ -131,15 +131,6 @@ margin = 3
 
 # --- Variable used to hold brightness level
 BrightLevel = 0
-
-# --- Screen Zone constraints
-CanvasPos = [(margin + width) * 8, (margin + height) * 8]
-PalettePos = [600 - ((margin + width) * 2), (margin + height) * 8]
-ResetPos = [349, 539, 349 + 85, 539 + 34]
-MinusPos = [(margin * 2) + 2, (margin + height) * 8 + 92,
-            ((margin * 2) + 2) + 26, ((margin + height) * 8 + 92) + 26]
-PlusPos = [(margin * 2) + 52, (margin + height) * 8 + 92,
-           ((margin * 2) + 52) + 26, ((margin + height) * 8 + 92) + 26]
               
 # --- Screen-clearing code goes here
 CANVAS = [[BLACK]*8 for _ in range(8)]
@@ -193,6 +184,10 @@ zBrightness = pygame.Rect(butBrightness.loc, butBrightness.size)
 zMinus = pygame.Rect(butMinus.loc, butMinus.size)
 zPlus = pygame.Rect(butPlus.loc, butPlus.size)
 zReset = pygame.Rect(butReset.loc, butReset.size)
+
+# --- Other screen Zone constraints:
+CanvasPos = [(margin + width) * 8, (margin + height) * 8]
+PalettePos = [600 - ((margin + width) * 2), (margin + height) * 8]
 
 # --- Set header text:
 pygame.display.set_caption("Canvas")
