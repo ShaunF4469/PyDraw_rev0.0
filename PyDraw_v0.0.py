@@ -18,7 +18,7 @@ class button:
         self.screen = screen
         self.lfont = lfont
         self.fsize = fsize
-        self.cen = cen
+        self.cen = cen        
 
     def draw(self):
         bx = self.loc[0]
@@ -43,7 +43,67 @@ class button:
         pygame.draw.rect(self.screen, self.color, [x, y, w, h])
         # --- Draw nameplate on button
         self.screen.blit(textbox,(wcen, hcen))
-        
+
+class label:
+    def __init__(self, nameplate, loc, size, color, border, screen, lfont, fsize=25, align='CenMid'):
+        self.nameplate = nameplate
+        self.loc = loc
+        self.size = size
+        self.color = color
+        self.border = border
+        self.screen = screen
+        self.lfont = lfont
+        self.fsize = fsize
+        self.align = align
+
+    def draw(self):
+        bx = self.loc[0]
+        by = self.loc[1]
+        x = bx + self.border
+        y = by + self.border
+        bw = self.size[0]
+        bh = self.size[1]
+        w = bw - (self.border * 2)
+        h = bh - (self.border * 2)
+        tsize = self.lfont.size(self.nameplate)
+        wcen = bx + ((bw - tsize[0]) / 2)
+        match self.align:
+            case "UpLeft":
+                wcen = bx + 5
+                hcen = by + 5
+            case "MidLeft":
+                wcen = bx + 5
+                hcen = by + ((bh - tsize[1]) / 2)
+            case "LowLeft":
+                wcen = bx + 5
+                hcen = by + ((bh - tsize[1]) - 5)
+            case "UpCen":
+                wcen = bx + ((bw - tsize[0]) / 2)
+                hcen = by + 5
+            case "MidCen":
+                wcen = bx + ((bw - tsize[0]) / 2)
+                hcen = by + ((bh - tsize[1]) / 2)
+            case "LowCen":
+                wcen = bx + ((bw - tsize[0]) / 2)
+                hcen = by + 5
+            case "UpRight":
+                wcen = bx + ((bw - tsize[0]) / 2)
+                hcen = by + 5
+            case "MidRight":
+                wcen = bx + ((bw - tsize[0]) / 2)
+                hcen = by + ((bh - tsize[1]) / 2)
+            case "LowRight":
+                wcen = bx + ((bw - tsize[0]) / 2)
+                hcen = by + 5
+
+        textbox = self.lfont.render(self.nameplate, True, (0, 0, 0))
+        # --- Draw border
+        pygame.draw.rect(self.screen, (0, 0, 0), [bx, by, bw, bh])
+        # --- Draw button face
+        pygame.draw.rect(self.screen, self.color, [x, y, w, h])
+        # --- Draw nameplate on button
+        self.screen.blit(textbox,(wcen, hcen))
+
 # --- Define initial colors
 BLACK = (0, 0, 0)
 SILVER = (192, 192, 192)
@@ -114,33 +174,44 @@ myfontSm = pygame.font.SysFont('Times New Roman MS', smFontSize)
 
 pygame.init()
  
-# --- Set the width and height of the screen [width, height]
+# --- Set the width and height of the screen [width, height]:
 size = (600, 600)
 screen = pygame.display.set_mode(size)
 
+# --- Background and screen objects (labels and buttons... so far):
 BG = WHITE
-RedSurface = myfont.render('Red = ', True, (0, 0, 0))
-BlueSurface = myfont.render('Blue = ', True, (0, 0, 0))
-GreenSurface = myfont.render('Green = ', True, (0, 0, 0))
+lblRed = label('Red', [130, ((height + margin) * 8) + 20], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+lblGreen = label('Green', [130, ((height + margin) * 8) + 60], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+lblBlue = label('Blue', [130, ((height + margin) * 8) + 100], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+butReset = button('Reset',[349, 539], [85, 33], ORANGE, 1, screen, myfontSm)
+butBrightness = button('Brightness', [margin - 1, (margin + height) * 8 + 30], [100, 100], BG, 1, screen, myfontSm, smFontSize, False)
+butMinus = button('-', [margin * 2 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfont)
+butPlus = button('+', [(margin * 2) + 50 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfont)
 
- 
+# --- Collision zones (using Rect objects):
+zBrightness = pygame.Rect(butBrightness.loc, butBrightness.size)
+zMinus = pygame.Rect(butMinus.loc, butMinus.size)
+zPlus = pygame.Rect(butPlus.loc, butPlus.size)
+zReset = pygame.Rect(butReset.loc, butReset.size)
+
+# --- Set header text:
 pygame.display.set_caption("Canvas")
  
-# --- Loop until the user clicks the close button.
+# --- Loop until the user clicks the close button:
 done = False
  
-# --- Used to manage how fast the screen updates
+# --- Used to manage how fast the screen updates:
 clock = pygame.time.Clock()
 
-# --- Init screen
+# --- Init screen:
 screen.fill(BG)
- # --- Mouse state variables
+ # --- Mouse state variables:
 lclick = False
 lclickedge = False
 mclick = False
 rclick = False
 
-# --- Program loop
+# --- Program loop:
 while not done:
     for event in pygame.event.get():  #User does something
         if event.type == pygame.QUIT:  # If user clicked close
@@ -170,6 +241,10 @@ while not done:
                     rclick = False
                             
             pos = pygame.mouse.get_pos()
+            ctrlBright = pygame.Rect.collidepoint(zBrightness, pos[0], pos[1])
+            ctrlMinus = pygame.Rect.collidepoint(zMinus, pos[0], pos[1])
+            ctrlPlus = pygame.Rect.collidepoint(zPlus, pos[0], pos[1])
+            ctrlReset = pygame.Rect.collidepoint(zReset, pos[0], pos[1])
             x = pos[0]
             y = pos[1]
             cx = CanvasPos[0]
@@ -196,33 +271,27 @@ while not done:
                 print("Click ", pos, "Pal. coordinates: ", row, col, PalettePos)
 
             # --- Reset clicked?
-            elif (lclick and pos[0] > ResetPos[0] and\
-            pos[0] < ResetPos[2] and\
-            pos[1] > ResetPos[1] and\
-            pos[1] < ResetPos[3]):
+            elif (lclick and ctrlReset):
                 CANVAS = [[BLACK]*8 for _ in range(8)]
                 print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
 
             # --- Brightness modified?
-            elif (lclickedge and pos[0] > MinusPos[0] and\
-            pos[0] < MinusPos[2] and\
-            pos[1] > MinusPos[1] and\
-            pos[1] < MinusPos[3] and\
-            BrightLevel > 0):
+            elif (lclickedge and ctrlMinus and BrightLevel > 0):
                 BrightLevel -= 1
                 print("Click ", pos, MinusPos)
-            elif (lclickedge and pos[0] > PlusPos[0] and\
-            pos[0] < PlusPos[2] and\
-            pos[1] > PlusPos[1] and\
-            pos[1] < PlusPos[3] and\
-            BrightLevel < 10):
+            elif (lclickedge and ctrlPlus and BrightLevel < 10):
                 BrightLevel += 1
                 print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
+            # -- Brightness controls with scrollwheel    
+            elif (scrlup and ctrlBright and BrightLevel < 10):
+                BrightLevel += 1
+            elif (scrldn and ctrlBright and BrightLevel > 0):
+                BrightLevel -= 1
             else:
                 
                 # Set the screen background
                 screen.fill(BG)
-        
+
     # --- Draw Canvas ---
     for row in range(8):
         for col in range(8):
@@ -261,36 +330,29 @@ while not done:
         write.writerows(palette_data)
     file.close()
     
-    # --- Draw RGB Values
+    # --- Draw RGB Values:    
+    # -- Load I/O labels:
     R,G,B = PaintBrush
-    RedSurface = myfont.render('Red = ' + str(R), True, (0, 0, 0), (255, 255, 255))
-    GreenSurface = myfont.render('Green = ' + str(G), True, (0, 0, 0), (255, 255, 255))
-    BlueSurface = myfont.render('Blue = ' + str(B), True, (0, 0, 0), (255, 255, 255))
-    pygame.draw.rect(screen, WHITE, [149, ((height + margin) * 8) + 29,
-                                        340, ((height + margin) * 8) + 160])
-    screen.blit(RedSurface, (150, ((height + margin) * 8) + 30))
-    screen.blit(GreenSurface, (150, ((height + margin) * 8) + 70))
-    screen.blit(BlueSurface, (150, ((height + margin) * 8) + 110))
-
+    ioRed = label('= ' + str(R), [235, ((height + margin) * 8) + 20], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+    ioGreen = label('= ' + str(G), [235, ((height + margin) * 8) + 60], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+    ioBlue = label('= ' + str(B), [235, ((height + margin) * 8) + 100], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+    
+    # -- Draw labels & I/O labels:
+    lblRed.draw(), ioRed.draw(), lblGreen.draw(), ioGreen.draw(), lblBlue.draw(), ioBlue.draw()
+    
     # --- Draw a Reset button
-    butReset = button('Reset',[349, 539], [85, 33], ORANGE, 1, screen, myfontSm)
     butReset.draw()
     
     # --- Draw Brightness controls
     # -- Main panel (not a button, but it works!)
-    butBrightness = button('Brightness', [margin - 1, (margin + height) * 8 + 30], [100, 100], BG, 1, screen, myfontSm, smFontSize, False)
     butBrightness.draw()
         
     # -- Brightness level display
     BrightLevelSur = myfont.render(str(BrightLevel), True, (0, 0, 0))
     screen.blit(BrightLevelSur,((margin * 2) + 30 + 5, (margin + height) * 8 + 60))
     
-    # -- Minus and Plus keys
-    butMinus = button('-', [margin * 2 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfontSm)
-    butMinus.draw()
-
-    butPlus = button('+', [(margin * 2) + 50 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfontSm)
-    butPlus.draw()
+    # -- Minus and Plus keys    
+    butMinus.draw(), butPlus.draw()
     
 # --- Draw paint brush display
     pygame.draw.rect(screen, BLACK, [479 + margin, 479, 102, 102])
