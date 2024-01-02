@@ -154,8 +154,6 @@ PALETTE [1][4] = LIME
 PALETTE [1][5] = YELLOW
 PALETTE [1][6] = BLUE
 PALETTE [1][7] = CYAN
-
-PaintBrush = BLUE
     
 pygame.font.init()
 lrgFontSize = 45
@@ -178,6 +176,17 @@ butReset = button('Reset',[349, 539], [85, 33], ORANGE, 1, screen, myfontSm)
 butBrightness = button('Brightness', [margin - 1, (margin + height) * 8 + 30], [100, 100], BG, 1, screen, myfontSm, smFontSize, False)
 butMinus = button('-', [margin * 2 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfont)
 butPlus = button('+', [(margin * 2) + 50 + 5, (margin + height) * 8 + 90], [30, 30], BG, 1, screen, myfont)
+
+# --- Paintbrush object(s):
+brushR = button('', [522, 522], [76, 76], BLUE, 1, screen, myfont)
+brushL = button('', [490, 490], [76, 76], PURPLE, 1, screen, myfont)
+
+R,G,B = brushL.color
+
+# --- Create dynamic labels
+ioRed = label('= ' + str(R), [235, ((height + margin) * 8) + 20], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+ioGreen = label('= ' + str(G), [235, ((height + margin) * 8) + 60], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+ioBlue = label('= ' + str(B), [235, ((height + margin) * 8) + 100], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
 
 # --- Collision zones (using Rect objects):
 zBrightness = pygame.Rect(butBrightness.loc, butBrightness.size)
@@ -214,6 +223,7 @@ while not done:
         else: #If user did not quit....
             # --- Mouse event(s):
             lclickedge = False
+            rclickedge = False
             scrlup = False
             scrldn = False
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -224,6 +234,7 @@ while not done:
                     mclick = True
                 if event.button == 3:
                     rclick = True
+                    rclickedge = True
                 if event.button == 4:
                     scrlup = True    
                 if event.button == 5:
@@ -238,12 +249,12 @@ while not done:
                             
             # --- Position and collision detect variables:
             pos = pygame.mouse.get_pos()
-            ctrlBright = pygame.Rect.collidepoint(zBrightness, pos[0], pos[1])
-            ctrlMinus = pygame.Rect.collidepoint(zMinus, pos[0], pos[1])
-            ctrlPlus = pygame.Rect.collidepoint(zPlus, pos[0], pos[1])
-            ctrlReset = pygame.Rect.collidepoint(zReset, pos[0], pos[1])
             x = pos[0]
             y = pos[1]
+            ctrlBright = pygame.Rect.collidepoint(zBrightness, x, y)
+            ctrlMinus = pygame.Rect.collidepoint(zMinus, x, y)
+            ctrlPlus = pygame.Rect.collidepoint(zPlus, x, y)
+            ctrlReset = pygame.Rect.collidepoint(zReset, x, y)            
             cx = CanvasPos[0]
             cy = CanvasPos[1]
             px = PalettePos[0]
@@ -256,14 +267,25 @@ while not done:
                 col = x // (width + margin)
                 row = y // (height + margin)
                 # Set that location to one
-                CANVAS[col][row] = PaintBrush                
+                CANVAS[col][row] = brushL.color
+            elif (rclick and x < cx and y < cy):
+                # Change the x/y screen coordinates to grid coordinates
+                col = x // (width + margin)
+                row = y // (height + margin)
+                # Set that location to one
+                CANVAS[col][row] = brushR.color
             
             # --- Selected new color
             elif (lclickedge and x > px and y < py):
                 col = (x - p_off) // (width + margin)
                 row = y // (height + margin)
                 # Set paintbrush color from palette
-                PaintBrush = PALETTE[col][row]                
+                brushL.color = PALETTE[col][row]
+            elif (rclickedge and x > px and y < py):
+                col = (x - p_off) // (width + margin)
+                row = y // (height + margin)
+                # Set paintbrush color from palette
+                brushR.color = PALETTE[col][row]                
 
             # --- Reset clicked?
             elif (lclick and ctrlReset):
@@ -287,6 +309,7 @@ while not done:
     # --- Draw Canvas ---
     for row in range(8):
         for col in range(8):
+
             pygame.draw.rect(screen,
                                 BLACK,
                                 [(margin + width) * col + (margin - 1),
@@ -324,35 +347,34 @@ while not done:
     
     # --- Draw RGB Values:    
     # -- Load I/O labels:
-    R,G,B = PaintBrush
-    ioRed = label('= ' + str(R), [235, ((height + margin) * 8) + 20], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
-    ioGreen = label('= ' + str(G), [235, ((height + margin) * 8) + 60], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
-    ioBlue = label('= ' + str(B), [235, ((height + margin) * 8) + 100], [100, 50], BG, 0, screen, myfont, 45, 'MidLeft')
+    R,G,B = brushL.color
+    ioRed.nameplate = '= ' + str(R)
+    ioGreen.nameplate = '= ' + str(G)
+    ioBlue.nameplate = '= ' + str(B)
     
     # -- Draw labels & I/O labels:
     lblRed.draw(), ioRed.draw(), lblGreen.draw(), ioGreen.draw(), lblBlue.draw(), ioBlue.draw()
     
-    # --- Draw a Reset button
+    # --- Draw a Reset button:
     butReset.draw()
     
-    # --- Draw Brightness controls
-    # -- Main panel (not a button, but it works!)
+    # --- Draw Brightness controls:
+    # -- Main panel (not a button, but it works!);
     butBrightness.draw()
         
-    # -- Brightness level display
+    # -- Brightness level display;
     BrightLevelSur = myfont.render(str(BrightLevel), True, (0, 0, 0))
     screen.blit(BrightLevelSur,((margin * 2) + 30 + 5, (margin + height) * 8 + 60))
     
-    # -- Minus and Plus keys    
+    # -- Minus and Plus keys;    
     butMinus.draw(), butPlus.draw()
-    
-# --- Draw paint brush display
-    pygame.draw.rect(screen, BLACK, [479 + margin, 479, 102, 102])
-    pygame.draw.rect(screen, PaintBrush, [480 + margin, 480, 100, 100])
-    
+
+# --- Draw paint brush display(s):    
+    brushR.draw(), brushL.draw()
+
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
- 
+
     # --- Limit to 60 frames per second
     clock.tick(60)
 
