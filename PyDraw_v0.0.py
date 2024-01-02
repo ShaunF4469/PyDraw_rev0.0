@@ -130,7 +130,7 @@ height = 52
 margin = 3
 
 # --- Variable used to hold brightness level
-BrightLevel = 0
+BrightLevel = 3
               
 # --- Screen-clearing code goes here
 CANVAS = [[BLACK]*8 for _ in range(8)]
@@ -316,8 +316,13 @@ while not done:
                                 (margin + height) * row + (margin - 1),
                                 width + 2,
                                 height + 2])
+            brR, brG, brB = CANVAS [col][row]
+            brR *= (BrightLevel / 10)
+            brG *= (BrightLevel / 10)
+            brB *= (BrightLevel / 10)
+            adjColor = brR, brG, brB
             pygame.draw.rect(screen,
-                                CANVAS [col][row],
+                                adjColor,
                                 [(margin + width) * col + margin,
                                 (margin + height) * row + margin,
                                 width,
