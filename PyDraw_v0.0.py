@@ -256,29 +256,24 @@ while not done:
                 col = x // (width + margin)
                 row = y // (height + margin)
                 # Set that location to one
-                CANVAS[col][row] = PaintBrush
-                print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
+                CANVAS[col][row] = PaintBrush                
             
             # --- Selected new color
             elif (lclickedge and x > px and y < py):
                 col = (x - p_off) // (width + margin)
                 row = y // (height + margin)
                 # Set paintbrush color from palette
-                PaintBrush = PALETTE[col][row]
-                print("Click ", pos, "Pal. coordinates: ", row, col, PalettePos)
+                PaintBrush = PALETTE[col][row]                
 
             # --- Reset clicked?
             elif (lclick and ctrlReset):
                 CANVAS = [[BLACK]*8 for _ in range(8)]
-                print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
-
+                
             # --- Brightness modified?
             elif (lclickedge and ctrlMinus and BrightLevel > 0):
                 BrightLevel -= 1
-                print("Click ", pos, MinusPos)
             elif (lclickedge and ctrlPlus and BrightLevel < 10):
-                BrightLevel += 1
-                print("Click ", pos, "Grid coordinates: ", row, col, CanvasPos)
+                BrightLevel += 1                
             # -- Brightness controls with scrollwheel    
             elif (scrlup and ctrlBright and BrightLevel < 10):
                 BrightLevel += 1
