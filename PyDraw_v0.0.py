@@ -212,6 +212,7 @@ while not done:
         if event.type == pygame.QUIT:  # If user clicked close
             done = True  # Flag that we are done so we exit this loop
         else: #If user did not quit....
+            # --- Mouse event(s):
             lclickedge = False
             scrlup = False
             scrldn = False
@@ -235,6 +236,7 @@ while not done:
                 if event.button == 3:
                     rclick = False
                             
+            # --- Position and collision detect variables:
             pos = pygame.mouse.get_pos()
             ctrlBright = pygame.Rect.collidepoint(zBrightness, pos[0], pos[1])
             ctrlMinus = pygame.Rect.collidepoint(zMinus, pos[0], pos[1])
@@ -248,7 +250,7 @@ while not done:
             py = PalettePos[1]
             p_off = size[0] - ((width + margin) * 2)
 
-            # --- Canvas Updates
+            # --- Canvas Updates:
             if (lclick and x < cx and y < cy):
                 # Change the x/y screen coordinates to grid coordinates
                 col = x // (width + margin)
