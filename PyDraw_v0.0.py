@@ -2,11 +2,11 @@ import pygame
 import os
 import sys
 import csv
-import board
-import adafruit_dotstar as dotstar
+#import board
+#import adafruit_dotstar as dotstar
 
 # --- Set matrix variable
-dots = dotstar.DotStar(board.SCK, board.MOSI, 64, brightness=0.50)
+#dots = dotstar.DotStar(board.SCK, board.MOSI, 64, brightness=0.50)
 
 class button:
     def __init__(self, nameplate, loc, size, color, border, screen, lfont, fsize=25, cen=True):
